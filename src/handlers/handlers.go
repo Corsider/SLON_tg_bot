@@ -24,21 +24,30 @@ func DefaultHandler(
 				u := entities.NewDefaultUser(userId, update.Message.Text)
 				err := repository.AddUser(u)
 				if err != nil {
-					b.SendMessage(ctx, &bot.SendMessageParams{
-						ChatID: userId,
-						Text:   "Что-то пошло не так. Попробуйте еще, но лучше не надо",
-					})
+					errorMessage(ctx, b, userId)
 				} else {
 					b.SendMessage(ctx, &bot.SendMessageParams{
 						ChatID: userId,
 						Text:   "Ok! Юзер записан в нашу базу: " + update.Message.Text,
 					})
 				}
-			default:
+			case entities.StateType_WaitingForTargetNameToEdit:
+				_, err := repository.GetSingleByCreatorAndTarget(userId, update.Message.Text)
+				if err != nil {
+					errorMessage(ctx, b, userId)
+				}
+
+				kb := &models.InlineKeyboardMarkup{
+					InlineKeyboard: entities.EditInlineKeyboard(),
+				}
+
 				b.SendMessage(ctx, &bot.SendMessageParams{
-					ChatID: userId,
-					Text:   "Что-то пошло не так...",
+					ChatID:      userId,
+					Text:        "Выберите, что хотите отредактировать у юзера:",
+					ReplyMarkup: kb,
 				})
+			default:
+				errorMessage(ctx, b, userId)
 			}
 		} else {
 			b.SendMessage(ctx, &bot.SendMessageParams{
@@ -48,6 +57,13 @@ func DefaultHandler(
 		}
 		stateManager.ClearState(userId)
 	}
+}
+
+func errorMessage(ctx context.Context, b *bot.Bot, chatId int64) {
+	b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: chatId,
+		Text:   "Что-то пошло не так.",
+	})
 }
 
 func InitHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
