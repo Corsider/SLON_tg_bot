@@ -9,10 +9,10 @@ const (
 )
 
 type TargetUser struct {
-	CreatorID int64  //
-	Target    string //
-	Schedule  ScheduleType
-	Tags      []string // [курсовая, диплом]
+	CreatorID int64        `db:"creator_id"`
+	Target    string       `db:"target"`
+	Schedule  ScheduleType `db:"schedule"`
+	Tags      *string      `db:"tags"` // [курсовая, диплом]
 }
 
 func NewDefaultUser(creatorId int64, target string) *TargetUser {

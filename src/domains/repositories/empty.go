@@ -18,14 +18,18 @@ func (e *EmptyRepository) GetUsersByCreator(creator int64) ([]*entities.TargetUs
 	return nil, nil
 }
 
-func (e *EmptyRepository) UpdateUser(creator int64, upd *entities.TargetUser) error {
-	return nil
-}
-
 func (e *EmptyRepository) RemoveUser(creator int64, target string) error {
 	return nil
 }
 
 func (e *EmptyRepository) GetSingleByCreatorAndTarget(creator int64, target string) (*entities.TargetUser, error) {
 	return nil, nil
+}
+
+func (e *EmptyRepository) UpdateUserTags(creator int64, target string, tags string) error {
+	return nil
+}
+
+func (e *EmptyRepository) UpdateUserSched(creator int64, target string, schedType entities.ScheduleType) error {
+	return nil
 }

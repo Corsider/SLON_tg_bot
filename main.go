@@ -23,7 +23,17 @@ func main() {
 		panic("empty token")
 	}
 
-	bot, err := app.NewBot(token)
+	postgresConn := os.Getenv("PSQL_CONN")
+	if postgresConn == "" {
+		panic("empty psql connStr")
+	}
+
+	redisConn := os.Getenv("REDIS_CONN")
+	if redisConn == "" {
+		panic("empty redis connStr")
+	}
+
+	bot, err := app.NewBot(token, postgresConn, redisConn)
 	if err != nil {
 		log.Fatal(err)
 	}

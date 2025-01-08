@@ -6,13 +6,15 @@ import (
 )
 
 type StateManager struct {
-	mu     sync.Mutex
-	states map[int64]entities.StateType
+	mu           sync.Mutex
+	states       map[int64]entities.StateType
+	selectedUser map[int64]string
 }
 
 func NewStateManager() *StateManager {
 	return &StateManager{
-		states: make(map[int64]entities.StateType),
+		states:       make(map[int64]entities.StateType),
+		selectedUser: make(map[int64]string),
 	}
 }
 
@@ -33,4 +35,17 @@ func (s *StateManager) ClearState(userID int64) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	delete(s.states, userID)
+}
+
+func (s *StateManager) SetUser(userID int64, target string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.selectedUser[userID] = target
+}
+
+func (s *StateManager) GetUser(userID int64) (string, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	usr, exists := s.selectedUser[userID]
+	return usr, exists
 }
