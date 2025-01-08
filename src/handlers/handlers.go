@@ -88,8 +88,8 @@ func DefaultHandler(
 					flatUser += "Триггер на каждое сообщение"
 				case entities.ScheduleType_EveryHour:
 					flatUser += "Каждый час"
-				case entities.ScheduleType_EveryDay:
-					flatUser += "Каждый день в 12:00"
+				case entities.ScheduleType_Random:
+					flatUser += "Случайный триггер на сообщение"
 				}
 				tags := "*нет тегов*"
 				if u.Tags != nil {
@@ -368,7 +368,7 @@ func CallBackHandlerSched(stateManager state_manager.IStateManager, repo reposit
 				return
 			}
 		case "sched2":
-			err := repo.UpdateUserSched(userId, target, entities.ScheduleType_EveryDay)
+			err := repo.UpdateUserSched(userId, target, entities.ScheduleType_Random)
 			if err != nil {
 				errorMessage(ctx, b, userId)
 				stateManager.ClearState(userId)
@@ -386,7 +386,7 @@ func CallBackHandlerSched(stateManager state_manager.IStateManager, repo reposit
 				case "sched1":
 					return "Каждый час"
 				case "sched2":
-					return "Каждый день в 12:00"
+					return "Случайный триггер на сообщение"
 				}
 				return ""
 			}(update.CallbackQuery.Data),
@@ -434,8 +434,8 @@ func CallBackHandlerMyUsers(stateManager state_manager.IStateManager, repo repos
 				resultMsg += "триггер на каждое сообщение,\n"
 			case entities.ScheduleType_EveryHour:
 				resultMsg += "каждый час,\n"
-			case entities.ScheduleType_EveryDay:
-				resultMsg += "каждый день в 12:00,\n"
+			case entities.ScheduleType_Random:
+				resultMsg += "случайный триггер на сообщение,\n"
 			}
 			var tg string
 			if t.Tags != nil {

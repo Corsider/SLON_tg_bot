@@ -40,7 +40,7 @@ func SchedulesInlineKeyboard() [][]models.InlineKeyboardButton {
 			{Text: "Триггер каждый час", CallbackData: "sched1"},
 		},
 		{
-			{Text: "Триггер каждый день в 12:00", CallbackData: "sched2"},
+			{Text: "Случайный триггер на сообщение", CallbackData: "sched2"},
 		},
 		{
 			{Text: "Назад в меню", CallbackData: "return"},

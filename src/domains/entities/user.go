@@ -5,7 +5,7 @@ type ScheduleType int
 const (
 	ScheduleType_ByMessage ScheduleType = 0
 	ScheduleType_EveryHour ScheduleType = 1
-	ScheduleType_EveryDay  ScheduleType = 2 // at 12:00
+	ScheduleType_Random    ScheduleType = 2
 )
 
 type TargetUser struct {
@@ -19,7 +19,7 @@ func NewDefaultUser(creatorId int64, target string) *TargetUser {
 	return &TargetUser{
 		CreatorID: creatorId,
 		Target:    target,
-		Schedule:  ScheduleType_ByMessage,
+		Schedule:  ScheduleType_Random,
 		Tags:      nil,
 	}
 }
