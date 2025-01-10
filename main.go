@@ -28,12 +28,12 @@ func main() {
 		panic("empty psql connStr")
 	}
 
-	redisConn := os.Getenv("REDIS_CONN")
-	if redisConn == "" {
-		panic("empty redis connStr")
-	}
+	//redisConn := os.Getenv("REDIS_CONN")
+	//if redisConn == "" {
+	//	panic("empty redis connStr")
+	//}
 
-	bot, err := app.NewBot(token, postgresConn, redisConn)
+	bot, err := app.NewBot(token, postgresConn, "redisConn")
 	if err != nil {
 		log.Fatal(err)
 	}

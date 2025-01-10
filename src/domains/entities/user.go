@@ -3,9 +3,9 @@ package entities
 type ScheduleType int
 
 const (
-	ScheduleType_ByMessage ScheduleType = 0
-	ScheduleType_EveryHour ScheduleType = 1
-	ScheduleType_Random    ScheduleType = 2
+	ScheduleType_ByMessage   ScheduleType = 0
+	ScheduleType_Every3Hours ScheduleType = 1
+	ScheduleType_Random      ScheduleType = 2
 )
 
 type TargetUser struct {
@@ -19,7 +19,7 @@ func NewDefaultUser(creatorId int64, target string) *TargetUser {
 	return &TargetUser{
 		CreatorID: creatorId,
 		Target:    target,
-		Schedule:  ScheduleType_Random,
+		Schedule:  ScheduleType_ByMessage,
 		Tags:      nil,
 	}
 }

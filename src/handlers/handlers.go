@@ -57,8 +57,14 @@ func DefaultHandler(
 					errorMessage(ctx, b, userId)
 				} else {
 					b.SendMessage(ctx, &bot.SendMessageParams{
-						ChatID:      userId,
-						Text:        "Ok! Юзер записан в нашу базу: " + update.Message.Text,
+						ChatID: userId,
+						Text: "Ok! Юзер записан в нашу базу: " + update.Message.Text +
+							"\n\nСправка по типам расписания:\n" +
+							"- По умолчанию ставится тип \"Случайный триггер на каждое сообщение\" - " +
+							"это значит, что на каждое сообщение юзера бот ответ с определенной вероятностью.\n" +
+							"- Тип \"Каждые 3 часа\" - юзер будет получать от бота сообщение раз в 3 часа.\n" +
+							"- Тип \"Случайный триггер на юзеров с этим типом\" - бот будет будет отправлять сообщение " +
+							"случайному пользователю из списка тех, кому вы присвоили это правило.",
 						ReplyMarkup: kb,
 					})
 				}
@@ -86,7 +92,7 @@ func DefaultHandler(
 				switch u.Schedule {
 				case entities.ScheduleType_ByMessage:
 					flatUser += "Триггер на каждое сообщение"
-				case entities.ScheduleType_EveryHour:
+				case entities.ScheduleType_Every3Hours:
 					flatUser += "Каждый час"
 				case entities.ScheduleType_Random:
 					flatUser += "Случайный триггер на сообщение"
@@ -173,8 +179,14 @@ func InitHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	}
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID:      update.Message.Chat.ID,
-		Text:        "Привет! Выбери одно из доступных действий:",
+		ChatID: update.Message.Chat.ID,
+		Text: "Привет! Выбери одно из доступных действий ниже. " +
+			"\n\nСправка по типам расписания:\n" +
+			"- По умолчанию ставится тип \"Случайный триггер на каждое сообщение\" - " +
+			"это значит, что на каждое сообщение юзера бот ответ с определенной вероятностью.\n" +
+			"- Тип \"Каждые 3 часа\" - юзер будет получать от бота сообщение раз в 3 часа.\n" +
+			"- Тип \"Случайный триггер на юзеров с этим типом\" - бот будет будет отправлять сообщение " +
+			"случайному пользователю из списка тех, кому вы присвоили это правило.",
 		ReplyMarkup: kb,
 	})
 }
@@ -361,7 +373,7 @@ func CallBackHandlerSched(stateManager state_manager.IStateManager, repo reposit
 				return
 			}
 		case "sched1":
-			err := repo.UpdateUserSched(userId, target, entities.ScheduleType_EveryHour)
+			err := repo.UpdateUserSched(userId, target, entities.ScheduleType_Every3Hours)
 			if err != nil {
 				errorMessage(ctx, b, userId)
 				stateManager.ClearState(userId)
@@ -382,11 +394,11 @@ func CallBackHandlerSched(stateManager state_manager.IStateManager, repo reposit
 			Text: "Расписание юзера " + target + " обновлено на " + func(s string) string {
 				switch s {
 				case "sched0":
-					return "Триггер на каждое сообщение"
-				case "sched1":
-					return "Каждый час"
-				case "sched2":
 					return "Случайный триггер на сообщение"
+				case "sched1":
+					return "Каждые 3 часа"
+				case "sched2":
+					return "Триггер на случайного юзера с таким типом"
 				}
 				return ""
 			}(update.CallbackQuery.Data),
@@ -431,11 +443,11 @@ func CallBackHandlerMyUsers(stateManager state_manager.IStateManager, repo repos
 			resultMsg += "\n===\nЮзер: " + t.Target + ",\nТип расписания: "
 			switch t.Schedule {
 			case entities.ScheduleType_ByMessage:
-				resultMsg += "триггер на каждое сообщение,\n"
-			case entities.ScheduleType_EveryHour:
-				resultMsg += "каждый час,\n"
-			case entities.ScheduleType_Random:
 				resultMsg += "случайный триггер на сообщение,\n"
+			case entities.ScheduleType_Every3Hours:
+				resultMsg += "каждые 3 часа,\n"
+			case entities.ScheduleType_Random:
+				resultMsg += "триггер на случайного юзера среди тех, у кого выбран этот тип расписания,\n"
 			}
 			var tg string
 			if t.Tags != nil {

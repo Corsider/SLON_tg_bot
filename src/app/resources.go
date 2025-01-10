@@ -4,7 +4,7 @@ import (
 	"SLON_tg_bot/src/domains/repositories"
 	"SLON_tg_bot/src/domains/repositories/postgres"
 	"SLON_tg_bot/src/state_manager"
-	"SLON_tg_bot/src/state_manager/redis"
+	"SLON_tg_bot/src/state_manager/in_memory"
 )
 
 type Resources struct {
@@ -14,7 +14,8 @@ type Resources struct {
 
 func NewResources(psqlConnStr, redisConnStr string) (*Resources, error) {
 	r := &Resources{}
-	r.StateManager = redis.NewStateManager(redisConnStr, "", 0)
+	//r.StateManager = redis.NewStateManager(redisConnStr, "", 0) // TODO restore redis
+	r.StateManager = in_memory.NewStateManager()
 	repo, err := postgres.NewPostgresRepository(psqlConnStr)
 	if err != nil {
 		return nil, err

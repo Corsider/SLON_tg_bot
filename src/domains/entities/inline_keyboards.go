@@ -34,13 +34,13 @@ func EditInlineKeyboard() [][]models.InlineKeyboardButton {
 func SchedulesInlineKeyboard() [][]models.InlineKeyboardButton {
 	return [][]models.InlineKeyboardButton{
 		{
-			{Text: "Триггер на каждое сообщение юзера", CallbackData: "sched0"},
+			{Text: "Случайный триггер на сообщение", CallbackData: "sched0"},
 		},
 		{
-			{Text: "Триггер каждый час", CallbackData: "sched1"},
+			{Text: "Триггер каждые 3 часа", CallbackData: "sched1"},
 		},
 		{
-			{Text: "Случайный триггер на сообщение", CallbackData: "sched2"},
+			{Text: "Триггер на случайного юзера", CallbackData: "sched2"},
 		},
 		{
 			{Text: "Назад в меню", CallbackData: "return"},
