@@ -16,6 +16,7 @@
 - `SLON_TOKEN` - токен тг бота
 - `PSQL_CONN` - connection string для подключения к postgres
 - `REDIS_CONN` - connection string для подключения к redis
+- `REDIS_PASS` - пароль redis
 
 Выполнить:
 1. `docker build -t slon_cp .`

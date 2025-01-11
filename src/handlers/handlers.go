@@ -7,6 +7,7 @@ import (
 	"context"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"log"
 	"regexp"
 	"strconv"
 )
@@ -40,6 +41,7 @@ func DefaultHandler(
 				existedUser, err := repository.GetSingleByCreatorAndTarget(userId, update.Message.Text)
 				if err != nil {
 					errorMessage(ctx, b, userId)
+					log.Printf("[APP] [ERR] Error occured:%v", err)
 					break
 				}
 
@@ -55,6 +57,7 @@ func DefaultHandler(
 				err = repository.AddUser(u)
 				if err != nil {
 					errorMessage(ctx, b, userId)
+					log.Printf("[APP] [ERR] Error occured:%v", err)
 				} else {
 					b.SendMessage(ctx, &bot.SendMessageParams{
 						ChatID: userId,
@@ -67,6 +70,7 @@ func DefaultHandler(
 							"случайному пользователю из списка тех, кому вы присвоили это правило.",
 						ReplyMarkup: kb,
 					})
+					log.Printf("[APP] [INFO] User %d has added target %s to the database.", userId, update.Message.Text)
 				}
 			case entities.StateType_WaitingForTargetNameToEdit:
 				if !nameCheck(update.Message.Text) {
@@ -116,6 +120,7 @@ func DefaultHandler(
 				err := repository.UpdateUserTags(userId, target, update.Message.Text)
 				if err != nil {
 					errorMessage(ctx, b, userId)
+					log.Printf("[APP] [ERR] Error occured:%v", err)
 					break
 				}
 				b.SendMessage(ctx, &bot.SendMessageParams{
@@ -123,8 +128,10 @@ func DefaultHandler(
 					Text:        "Теги юзера " + target + " обновлены.",
 					ReplyMarkup: kb,
 				})
+				log.Printf("[APP] [INFO] User %d has updated target's tags (%s).", userId, target)
 			default:
 				errorMessage(ctx, b, userId)
+				log.Printf("[APP] [ERR] Error occured.")
 			}
 		} else {
 			b.SendMessage(ctx, &bot.SendMessageParams{
@@ -190,6 +197,7 @@ func CallBackHandlerAddUser(stateManager state_manager.IStateManager, repo repos
 		users, err := repo.GetUsersByCreator(userId)
 		if err != nil {
 			errorMessage(ctx, b, userId)
+			log.Printf("[APP] [ERR] Error occured:%v", err)
 		}
 
 		b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
@@ -314,6 +322,7 @@ func CallBackHandlerEditDelete(stateManager state_manager.IStateManager, repo re
 		target, exists := stateManager.GetUser(userId)
 		if !exists {
 			errorMessage(ctx, b, userId)
+			log.Printf("[APP] [ERR] Error occured.")
 			stateManager.ClearState(userId)
 			return
 		}
@@ -321,6 +330,7 @@ func CallBackHandlerEditDelete(stateManager state_manager.IStateManager, repo re
 		err := repo.RemoveUser(userId, target)
 		if err != nil {
 			errorMessage(ctx, b, userId)
+			log.Printf("[APP] [ERR] Error occured:%v", err)
 			stateManager.ClearState(userId)
 			return
 		}
@@ -331,6 +341,7 @@ func CallBackHandlerEditDelete(stateManager state_manager.IStateManager, repo re
 			Text:        "Юзер " + target + " удален.",
 			ReplyMarkup: kb,
 		})
+		log.Printf("[APP] [INFO] User %d has deleted target %s from the database.", userId, target)
 
 		stateManager.ClearState(userId)
 	}
@@ -348,6 +359,7 @@ func CallBackHandlerSched(stateManager state_manager.IStateManager, repo reposit
 		target, exists := stateManager.GetUser(userId)
 		if !exists {
 			errorMessage(ctx, b, userId)
+			log.Printf("[APP] [ERR] Error occured.")
 			stateManager.ClearState(userId)
 			return
 		}
@@ -361,6 +373,7 @@ func CallBackHandlerSched(stateManager state_manager.IStateManager, repo reposit
 			err := repo.UpdateUserSched(userId, target, entities.ScheduleType_ByMessage)
 			if err != nil {
 				errorMessage(ctx, b, userId)
+				log.Printf("[APP] [ERR] Error occured:%v", err)
 				stateManager.ClearState(userId)
 				return
 			}
@@ -368,6 +381,7 @@ func CallBackHandlerSched(stateManager state_manager.IStateManager, repo reposit
 			err := repo.UpdateUserSched(userId, target, entities.ScheduleType_Every3Hours)
 			if err != nil {
 				errorMessage(ctx, b, userId)
+				log.Printf("[APP] [ERR] Error occured:%v", err)
 				stateManager.ClearState(userId)
 				return
 			}
@@ -375,6 +389,7 @@ func CallBackHandlerSched(stateManager state_manager.IStateManager, repo reposit
 			err := repo.UpdateUserSched(userId, target, entities.ScheduleType_Random)
 			if err != nil {
 				errorMessage(ctx, b, userId)
+				log.Printf("[APP] [ERR] Error occured:%v", err)
 				stateManager.ClearState(userId)
 				return
 			}
@@ -396,6 +411,7 @@ func CallBackHandlerSched(stateManager state_manager.IStateManager, repo reposit
 			}(update.CallbackQuery.Data),
 			ReplyMarkup: kb,
 		})
+		log.Printf("[APP] [INFO] User %d has updated target's (%s) schedule to type %s.", userId, target, update.CallbackQuery.Data)
 
 		stateManager.ClearState(userId)
 	}
@@ -417,6 +433,7 @@ func CallBackHandlerMyUsers(stateManager state_manager.IStateManager, repo repos
 		myTargets, err := repo.GetUsersByCreator(userId)
 		if err != nil {
 			errorMessage(ctx, b, userId)
+			log.Printf("[APP] [ERR] Error occured:%v", err)
 			return
 		}
 
