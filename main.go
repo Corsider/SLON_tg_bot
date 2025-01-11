@@ -3,16 +3,16 @@ package main
 import (
 	"SLON_tg_bot/src/app"
 	"context"
-	"github.com/joho/godotenv"
 	"log"
+	"net/http"
 	"os"
 )
 
-func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal(err)
-	}
-}
+//func init() {
+//	if err := godotenv.Load(); err != nil {
+//		log.Fatal(err)
+//	}
+//}
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -38,5 +38,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	bot.Bot.Start(ctx)
+	//bot.Bot.Start(ctx)
+	//log.Println("Bot started.")
+	go func() {
+		bot.Bot.Start(ctx)
+		log.Println("Bot started.")
+	}()
+
+	// in order to work with strange cloud.ru container system
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
+	port := ":8080"
+	log.Printf("HTTP server is running on port %s\n", port)
+	if err := http.ListenAndServe(port, nil); err != nil {
+		log.Fatalf("HTTP server failed: %v", err)
+	}
 }
