@@ -23,3 +23,21 @@ func NewDefaultUser(creatorId int64, target string) *TargetUser {
 		Tags:      nil,
 	}
 }
+
+func (t *TargetUser) ToFlatUser() string {
+	flatUser := "Юзер: " + t.Target + "\nТип расписания: "
+	switch t.Schedule {
+	case ScheduleType_ByMessage:
+		flatUser += "Случайный триггер на сообщение"
+	case ScheduleType_Every3Hours:
+		flatUser += "Триггер каждые 3 часа"
+	case ScheduleType_Random:
+		flatUser += "Случайный триггер на случайного юзера с этим типом"
+	}
+	tags := "*нет тегов*"
+	if t.Tags != nil {
+		tags = *t.Tags
+	}
+	flatUser += "\nТеги: " + tags
+	return flatUser
+}
