@@ -9,8 +9,8 @@ type BotApp struct {
 	Bot *bot.Bot
 }
 
-func NewBot(token, psqlConnString, redisConnString string) (*BotApp, error) {
-	res, err := NewResources(psqlConnString, redisConnString)
+func NewBot(token, psqlConnString, redisConnString, redisPass string) (*BotApp, error) {
+	res, err := NewResources(psqlConnString, redisConnString, redisPass)
 	if err != nil {
 		return nil, err
 	}

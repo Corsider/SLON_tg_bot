@@ -12,9 +12,9 @@ type Resources struct {
 	Repository   repositories.IRepository
 }
 
-func NewResources(psqlConnStr, redisConnStr string) (*Resources, error) {
+func NewResources(psqlConnStr, redisConnStr, redisPass string) (*Resources, error) {
 	r := &Resources{}
-	r.StateManager = redis.NewStateManager(redisConnStr, "", 0)
+	r.StateManager = redis.NewStateManager(redisConnStr, redisPass, 0)
 	//r.StateManager = in_memory.NewStateManager()
 	repo, err := postgres.NewPostgresRepository(psqlConnStr)
 	if err != nil {
