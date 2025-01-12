@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	_ "github.com/lib/pq"
+	"strconv"
+	"strings"
 )
 
 type PostgresRepository struct {
@@ -75,9 +77,14 @@ func (r *PostgresRepository) RemoveUser(creator int64, target string) error {
 	return nil
 }
 
-func (r *PostgresRepository) UpdateUserTags(creator int64, target string, tags string) error {
+func (r *PostgresRepository) UpdateUserTags(creator int64, target string, tags []entities.TagType) error {
 	query := `UPDATE app.targets SET tags = $1 WHERE creator_id = $2 AND target = $3`
-	_, err := r.db.Exec(query, tags, creator, target)
+	intTags := "{"
+	for _, tag := range tags {
+		intTags += strconv.Itoa(int(tag)) + ","
+	}
+	intTags = strings.TrimSuffix(intTags, ",")
+	_, err := r.db.Exec(query, intTags+"}", creator, target)
 	if err != nil {
 		return err
 	}

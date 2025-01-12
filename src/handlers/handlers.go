@@ -14,6 +14,17 @@ import (
 
 var tgNameCheck = regexp.MustCompile(`^@[a-zA-Z0-9_]{2,}$`)
 
+var spravka = "\n\nСправка по типам расписания:\n" +
+	"- По умолчанию ставится тип \"Случайный триггер на сообщение\" - " +
+	"это значит, что на каждое сообщение юзера бот ответит с определенной вероятностью.\n" +
+	"- Тип \"Триггер каждые 3 часа\" - юзер будет получать от бота сообщение раз в 3 часа.\n" +
+	"- Тип \"Случайный триггер на случайного юзера с этим типом\" - бот будет будет отправлять сообщение " +
+	"случайному пользователю из списка тех, кому вы присвоили это правило.\n\n" +
+	"*Внимание!*\n" +
+	"Модель может допускать ошибки, быть грубой и не этичной. Все сказанное моделью не является мнением авторов," +
+	" а является лишь плодом математики внутри модели. Модель стоит использовать исключительно в исследовательских и развлекательных" +
+	" целях."
+
 func DefaultHandler(
 	stateManager state_manager.IStateManager,
 	repository repositories.IRepository,
@@ -60,14 +71,8 @@ func DefaultHandler(
 					log.Printf("[APP] [ERR] Error occured:%v", err)
 				} else {
 					b.SendMessage(ctx, &bot.SendMessageParams{
-						ChatID: userId,
-						Text: "Ok! Юзер записан в нашу базу: " + update.Message.Text +
-							"\n\nСправка по типам расписания:\n" +
-							"- По умолчанию ставится тип \"Случайный триггер на сообщение\" - " +
-							"это значит, что на каждое сообщение юзера бот ответ с определенной вероятностью.\n" +
-							"- Тип \"Триггер каждые 3 часа\" - юзер будет получать от бота сообщение раз в 3 часа.\n" +
-							"- Тип \"Случайный триггер на случайного юзера с этим типом\" - бот будет будет отправлять сообщение " +
-							"случайному пользователю из списка тех, кому вы присвоили это правило.",
+						ChatID:      userId,
+						Text:        "Ok! Юзер записан в нашу базу: " + update.Message.Text + spravka,
 						ReplyMarkup: kb,
 					})
 					log.Printf("[APP] [INFO] User %d has added target %s to the database.", userId, update.Message.Text)
@@ -99,50 +104,44 @@ func DefaultHandler(
 					ReplyMarkup: kb1,
 				})
 				stateManager.SetUser(userId, update.Message.Text)
-			case entities.StateType_WaitingForTags:
-				target, exists := stateManager.GetUser(userId)
-				if !exists {
-					b.SendMessage(ctx, &bot.SendMessageParams{
-						ChatID:      userId,
-						Text:        "Такого юзера нет.",
-						ReplyMarkup: kb,
-					})
-					break
-				}
-				// todo check tags spelling
-				if len(update.Message.Text) > 500 {
-					b.SendMessage(ctx, &bot.SendMessageParams{
-						ChatID:      userId,
-						Text:        "Слишком большая длина текста тегов",
-						ReplyMarkup: kb,
-					})
-				}
-				err := repository.UpdateUserTags(userId, target, update.Message.Text)
-				if err != nil {
-					errorMessage(ctx, b, userId)
-					log.Printf("[APP] [ERR] Error occured:%v", err)
-					break
-				}
-				b.SendMessage(ctx, &bot.SendMessageParams{
-					ChatID:      userId,
-					Text:        "Теги юзера " + target + " обновлены.",
-					ReplyMarkup: kb,
-				})
-				log.Printf("[APP] [INFO] User %d has updated target's tags (%s).", userId, target)
+			//case entities.StateType_WaitingForTags:
+			//	target, exists := stateManager.GetUser(userId)
+			//	if !exists {
+			//		b.SendMessage(ctx, &bot.SendMessageParams{
+			//			ChatID:      userId,
+			//			Text:        "Такого юзера нет.",
+			//			ReplyMarkup: kb,
+			//		})
+			//		break
+			//	}
+			//
+			//	if len(update.Message.Text) > 500 {
+			//		b.SendMessage(ctx, &bot.SendMessageParams{
+			//			ChatID:      userId,
+			//			Text:        "Слишком большая длина текста тегов",
+			//			ReplyMarkup: kb,
+			//		})
+			//	}
+			//	err := repository.UpdateUserTags(userId, target, update.Message.Text)
+			//	if err != nil {
+			//		errorMessage(ctx, b, userId)
+			//		log.Printf("[APP] [ERR] Error occured:%v", err)
+			//		break
+			//	}
+			//	b.SendMessage(ctx, &bot.SendMessageParams{
+			//		ChatID:      userId,
+			//		Text:        "Теги юзера " + target + " обновлены.",
+			//		ReplyMarkup: kb,
+			//	})
+			//	log.Printf("[APP] [INFO] User %d has updated target's tags (%s).", userId, target)
 			default:
 				errorMessage(ctx, b, userId)
 				log.Printf("[APP] [ERR] Error occured.")
 			}
 		} else {
 			b.SendMessage(ctx, &bot.SendMessageParams{
-				ChatID: userId,
-				Text: "Нет такой команды, нажмите /start или выберите одно из действий ниже:" +
-					"\n\nСправка по типам расписания:\n" +
-					"- По умолчанию ставится тип \"Случайный триггер на сообщение\" - " +
-					"это значит, что на каждое сообщение юзера бот ответ с определенной вероятностью.\n" +
-					"- Тип \"Триггер каждые 3 часа\" - юзер будет получать от бота сообщение раз в 3 часа.\n" +
-					"- Тип \"Случайный триггер на случайного юзера с этим типом\" - бот будет будет отправлять сообщение " +
-					"случайному пользователю из списка тех, кому вы присвоили это правило.",
+				ChatID:      userId,
+				Text:        "Нет такой команды, нажмите /start или выберите одно из действий ниже:" + spravka,
 				ReplyMarkup: kb,
 			})
 		}
@@ -178,14 +177,8 @@ func InitHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	}
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID: update.Message.Chat.ID,
-		Text: "Привет! Выбери одно из доступных действий ниже. " +
-			"\n\nСправка по типам расписания:\n" +
-			"- По умолчанию ставится тип \"Случайный триггер на сообщение\" - " +
-			"это значит, что на каждое сообщение юзера бот ответ с определенной вероятностью.\n" +
-			"- Тип \"Триггер каждые 3 часа\" - юзер будет получать от бота сообщение раз в 3 часа.\n" +
-			"- Тип \"Случайный триггер на случайного юзера с этим типом\" - бот будет будет отправлять сообщение " +
-			"случайному пользователю из списка тех, кому вы присвоили это правило.",
+		ChatID:      update.Message.Chat.ID,
+		Text:        "Привет! Выбери одно из доступных действий ниже. " + spravka,
 		ReplyMarkup: kb,
 	})
 }
@@ -278,31 +271,6 @@ func CallBackHandlerEditSched(stateManager state_manager.IStateManager) func(ctx
 		})
 
 		stateManager.ClearState(userId)
-	}
-}
-
-func CallBackHandlerEditTags(stateManager state_manager.IStateManager) func(ctx context.Context, b *bot.Bot, update *models.Update) {
-	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
-		userId := update.CallbackQuery.Message.Message.Chat.ID
-
-		b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
-			CallbackQueryID: update.CallbackQuery.ID,
-			ShowAlert:       false,
-		})
-
-		kb := &models.InlineKeyboardMarkup{
-			InlineKeyboard: entities.ReturnInlineKeyboard(),
-		}
-
-		// todo add current tags to Text
-		b.EditMessageText(ctx, &bot.EditMessageTextParams{
-			ChatID:      userId,
-			MessageID:   update.CallbackQuery.Message.Message.ID,
-			Text:        "Пришли теги для уточнения поведения модели через запятую",
-			ReplyMarkup: kb,
-		})
-
-		stateManager.SetState(userId, entities.StateType_WaitingForTags)
 	}
 }
 
@@ -447,9 +415,9 @@ func CallBackHandlerMyUsers(stateManager state_manager.IStateManager, repo repos
 			return
 		}
 
-		resultMsg := "Твои юзеры (" + strconv.Itoa(len(myTargets)) + "/5)" + ":\n"
+		resultMsg := "Твои юзеры (" + strconv.Itoa(len(myTargets)) + "/5)" + ":\n\n"
 		for _, t := range myTargets {
-			resultMsg += "\n=====\n" + t.ToFlatUser() + "\n"
+			resultMsg += "=======================\n" + t.ToFlatUser() + "\n"
 		}
 
 		b.EditMessageText(ctx, &bot.EditMessageTextParams{
@@ -479,15 +447,9 @@ func CallBackHandlerReturn(stateManger state_manager.IStateManager) func(ctx con
 		})
 
 		b.EditMessageText(ctx, &bot.EditMessageTextParams{
-			ChatID:    userId,
-			MessageID: update.CallbackQuery.Message.Message.ID,
-			Text: "Привет! Выбери одно из доступных действий:" +
-				"\n\nСправка по типам расписания:\n" +
-				"- По умолчанию ставится тип \"Случайный триггер на сообщение\" - " +
-				"это значит, что на каждое сообщение юзера бот ответ с определенной вероятностью.\n" +
-				"- Тип \"Триггер каждые 3 часа\" - юзер будет получать от бота сообщение раз в 3 часа.\n" +
-				"- Тип \"Случайный триггер на случайного юзера с этим типом\" - бот будет будет отправлять сообщение " +
-				"случайному пользователю из списка тех, кому вы присвоили это правило.",
+			ChatID:      userId,
+			MessageID:   update.CallbackQuery.Message.Message.ID,
+			Text:        "Привет! Выбери одно из доступных действий:" + spravka,
 			ReplyMarkup: kb,
 		})
 

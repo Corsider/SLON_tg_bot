@@ -20,7 +20,10 @@ func EditInlineKeyboard() [][]models.InlineKeyboardButton {
 			{Text: "Изм. расписание", CallbackData: "editSched"},
 		},
 		{
-			{Text: "Изм. теги", CallbackData: "editTags"},
+			{Text: "Доб. теги", CallbackData: "addTags"},
+		},
+		{
+			{Text: "Удал. теги", CallbackData: "delTags"},
 		},
 		{
 			{Text: "Удалить", CallbackData: "editDelete"},
@@ -52,6 +55,40 @@ func ReturnInlineKeyboard() [][]models.InlineKeyboardButton {
 	return [][]models.InlineKeyboardButton{
 		{
 			{Text: "Отмена", CallbackData: "return"},
+		},
+	}
+}
+
+func AddTagsInlineKeyboard() [][]models.InlineKeyboardButton {
+	return [][]models.InlineKeyboardButton{
+		{
+			{Text: "Оскорбление", CallbackData: "tag0"},
+		},
+		{
+			{Text: "Непристойность", CallbackData: "tag1"},
+		},
+		{
+			{Text: "Угроза", CallbackData: "tag2"},
+		},
+		{
+			{Text: "Готово", CallbackData: "tagReady"},
+		},
+	}
+}
+
+func DelTagsInlineKeyboard() [][]models.InlineKeyboardButton {
+	return [][]models.InlineKeyboardButton{
+		{
+			{Text: "Оскорбление", CallbackData: "dtag0"},
+		},
+		{
+			{Text: "Непристойность", CallbackData: "dtag1"},
+		},
+		{
+			{Text: "Угроза", CallbackData: "dtag2"},
+		},
+		{
+			{Text: "Готово", CallbackData: "tagReady"},
 		},
 	}
 }

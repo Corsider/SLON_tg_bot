@@ -34,9 +34,6 @@ func main() {
 	}
 
 	redisPass := os.Getenv("REDIS_PASS")
-	if redisPass == "" {
-		panic("empty redis pass")
-	}
 
 	bot, err := app.NewBot(token, postgresConn, redisConn, redisPass)
 	if err != nil {

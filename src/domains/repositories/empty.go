@@ -26,7 +26,7 @@ func (e *EmptyRepository) GetSingleByCreatorAndTarget(creator int64, target stri
 	return nil, nil
 }
 
-func (e *EmptyRepository) UpdateUserTags(creator int64, target string, tags string) error {
+func (e *EmptyRepository) UpdateUserTags(creator int64, target string, tags []entities.TagType) error {
 	return nil
 }
 

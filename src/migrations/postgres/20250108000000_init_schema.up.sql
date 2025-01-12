@@ -6,3 +6,9 @@ create table if not exists app.targets(
     schedule int not null,
     tags text default null
 );
+
+update app.targets
+    set tags = '{}';
+
+alter table app.targets
+alter column tags TYPE int[] USING '{}'::INT[];
