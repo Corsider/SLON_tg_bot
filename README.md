@@ -8,7 +8,7 @@
 - rabbitmq
 - grafana, prometheus
 - nginx
-- chatgpt api, telegram api
+- telegram api
 - docker
 
 # Для запуска:
